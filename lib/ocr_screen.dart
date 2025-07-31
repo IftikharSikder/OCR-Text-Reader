@@ -231,7 +231,7 @@ class _OCRScreenState extends State<OCRScreen> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          'Medical Text Recognition',
+          'Text Recognition',
           style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
         ),
         backgroundColor: Colors.blue.shade600,
