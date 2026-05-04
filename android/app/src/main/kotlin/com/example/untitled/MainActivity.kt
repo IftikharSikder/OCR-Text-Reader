@@ -1,4 +1,4 @@
-package com.example.hand_written_recognition
+package com.example.untitled
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -42,13 +42,9 @@ class _OCRScreenState extends State<OCRScreen> {
 
       final InputImage inputImage = InputImage.fromFilePath(imageFile.path);
 
-      final textRecognizer = TextRecognizer(
-        script: TextRecognitionScript.latin,
-      );
+      final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
-      final RecognizedText result = await textRecognizer.processImage(
-        inputImage,
-      );
+      final RecognizedText result = await textRecognizer.processImage(inputImage);
 
       String processedText = _processRecognizedText(result);
 
@@ -114,7 +110,7 @@ class _OCRScreenState extends State<OCRScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red.shade600,
+        backgroundColor: Colors.indigoAccent,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -123,60 +119,57 @@ class _OCRScreenState extends State<OCRScreen> {
   void _showImageSourceDialog() {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder:
-          (context) => Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Select Image Source',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'For best results: Use good lighting, ensure text is clear and focused',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+                _buildSourceOption(
+                  icon: Icons.camera_alt,
+                  label: 'Camera',
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickAndRecognizeText(ImageSource.camera);
+                  },
                 ),
-                SizedBox(height: 20),
-                Text(
-                  'Select Image Source',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                _buildSourceOption(
+                  icon: Icons.photo_library,
+                  label: 'Gallery',
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickAndRecognizeText(ImageSource.gallery);
+                  },
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'For best results: Use good lighting, ensure text is clear and focused',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildSourceOption(
-                      icon: Icons.camera_alt,
-                      label: 'Camera',
-                      onTap: () {
-                        Navigator.pop(context);
-                        pickAndRecognizeText(ImageSource.camera);
-                      },
-                    ),
-                    _buildSourceOption(
-                      icon: Icons.photo_library,
-                      label: 'Gallery',
-                      onTap: () {
-                        Navigator.pop(context);
-                        pickAndRecognizeText(ImageSource.gallery);
-                      },
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
               ],
             ),
-          ),
+            SizedBox(height: 16),
+          ],
+        ),
+      ),
     );
   }
 
@@ -231,7 +224,7 @@ class _OCRScreenState extends State<OCRScreen> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          'Text Recognition',
+          'Scan Text',
           style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
         ),
         backgroundColor: Colors.blue.shade600,
@@ -262,19 +255,12 @@ class _OCRScreenState extends State<OCRScreen> {
                 SizedBox(height: 12),
                 Text(
                   'Scan & Extract Text',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Capture prescriptions and medical documents',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.9)),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -299,33 +285,25 @@ class _OCRScreenState extends State<OCRScreen> {
                     ),
                     child: ElevatedButton.icon(
                       onPressed: isProcessing ? null : _showImageSourceDialog,
-                      icon:
-                          isProcessing
-                              ? SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                              : Icon(Icons.camera_alt, size: 24),
+                      icon: isProcessing
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : Icon(Icons.camera_alt, size: 24),
                       label: Text(
                         isProcessing ? 'Processing...' : 'Capture Document',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue.shade600,
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 0,
                       ),
                     ),
@@ -385,47 +363,39 @@ class _OCRScreenState extends State<OCRScreen> {
                           ),
                         ],
                       ),
-                      child:
-                          recognizedText.isEmpty
-                              ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.text_fields,
-                                      size: 48,
-                                      color: Colors.grey[400],
+                      child: recognizedText.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.text_fields, size: 48, color: Colors.grey[400]),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'No text extracted yet',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                      'No text extracted yet',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey[600],
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      'Capture a document to extract text',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[500],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                              : SingleChildScrollView(
-                                child: SelectableText(
-                                  recognizedText,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    height: 1.5,
-                                    color: Colors.grey[800],
                                   ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Capture a document to extract text',
+                                    style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : SingleChildScrollView(
+                              child: SelectableText(
+                                recognizedText,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  height: 1.5,
+                                  color: Colors.grey[800],
                                 ),
                               ),
+                            ),
                     ),
                   ),
                 ],
